@@ -1,3 +1,10 @@
+interface ImportMetaEnv {
+  VITE_APP_TITLE: string
+  VITE_API_URL: string
+  VITE_FIGMA_API_URL: string
+  VITE_FIGMA_ACCESS_TOKEN?: string
+}
+
 interface Config {
   app: {
     title: string;
@@ -25,7 +32,7 @@ export const config: Config = {
 } as const;
 
 // Type-safe environment helpers
-export function requireEnvVar(name: keyof typeof import.meta.env): string {
+export function requireEnvVar(name: keyof ImportMetaEnv): string {
   const value = import.meta.env[name];
   if (!value) {
     throw new Error(`Missing required environment variable: ${name}`);
