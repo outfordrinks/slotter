@@ -21,8 +21,9 @@ export default defineConfig({
     sourcemap: true,
   },
   server: {
-    port: 3000,
-    strictPort: true,
-    host: true,
-  },
+    port: 3000, // Default port
+    strictPort: false, // Allow Vite to try other ports if 3000 is taken
+    host: true, // Allow external access
+    open: true // Open browser on server start
+  }
 })
