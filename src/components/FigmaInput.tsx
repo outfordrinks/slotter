@@ -11,15 +11,23 @@ import {
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { useFigmaStore } from "@/store"
+import { useToast } from '@/hooks/use-toast'
 import { parseFigmaUrl } from "@/utils/figmaUrlParser"
 import { fetchFigmaFile } from "@/utils/figmaApi"
-import { useToast } from "@/hooks/use-toast"
+import { transformDocument } from "@/utils/nodeTransforms"
 
 export function FigmaInput() {
   console.log('🔄 FigmaInput component rendered')
   
-  const { fileKey, setFileKey, reset } = useFigmaStore()
-  const [isLoading, setIsLoading] = useState(false)
+  const {
+    fileKey,
+    setFileKey,
+    setRootNode,
+    setNodeId,
+    isLoading,
+    setLoading
+  } = useFigmaStore()
+
   const { toast } = useToast()
 
   // Component mount and update logging
@@ -36,76 +44,98 @@ export function FigmaInput() {
   }, [fileKey, isLoading, toast])
 
   const handleLoadFile = async () => {
-    console.log('🚀 handleLoadFile initiated', {
-      fileKey,
-      isLoading
-    })
-
-    if (!fileKey) {
-      console.warn('⚠️ No fileKey provided')
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Please enter a Figma URL",
-      })
-      return
-    }
-    
     try {
-      setIsLoading(true)
-      console.log('🔍 Parsing URL:', fileKey)
-      
+      console.log('🚀 Load file initiated')
+
+      if (!fileKey) {
+        console.log('⚠️ No file key provided')
+        toast({
+          title: 'Error',
+          description: 'Please enter a Figma file URL',
+          variant: 'destructive',
+        })
+        return
+      }
+
+      // Set loading state
+      console.log('⏳ Setting loading state')
+      setLoading(true)
+
       // Parse the URL to get fileKey and nodeId
+      console.log('🔍 Parsing URL:', fileKey)
       const { fileKey: parsedKey, nodeId } = parseFigmaUrl(fileKey)
       console.log('✅ URL parsed successfully:', { parsedKey, nodeId })
       
+      // Store nodeId in the store
+      if (nodeId) {
+        console.log('💾 Storing nodeId:', nodeId)
+        setNodeId(nodeId)
+      }
+
       // Fetch the file data
       console.log('📡 Fetching file data...')
       const response = await fetchFigmaFile({ fileKey: parsedKey, nodeId })
-      console.log('📦 API Response received:', response)
-      
-      if (response.error) {
-        console.error('❌ API returned error:', response.error)
-        throw new Error(response.error.err)
+      console.log('✅ File data fetched:', response)
+
+      if ('error' in response && response.error) {
+        console.log('❌ Error in response:', response.error)
+        toast({
+          title: 'Error',
+          description: response.error.err,
+          variant: 'destructive',
+        })
+        return
       }
 
-      if (!response.file) {
-        console.error('❌ No file data in response')
-        throw new Error('No file data received')
+      if (!response.file?.document) {
+        console.log('❌ No document in response')
+        toast({
+          title: 'Error',
+          description: 'Invalid file data received',
+          variant: 'destructive',
+        })
+        return
       }
 
-      // Show success message
-      console.log('✨ File loaded successfully:', response.file.name)
+      // Transform the document
+      console.log('🔄 Transforming document...')
+      const transformedData = transformDocument(response.file.document, response.file.imageUrls)
+      console.log('✅ Document transformed:', transformedData)
+
+      // Store the transformed data
+      console.log('💾 Storing transformed data')
+      setRootNode(transformedData)
+
+      console.log('✅ Load file completed successfully')
       toast({
-        title: "Success",
-        description: `Loaded file: ${response.file.name}`,
+        title: 'Success',
+        description: 'File loaded successfully',
       })
 
     } catch (error) {
-      console.error('💥 Error in handleLoadFile:', error)
+      console.error('❌ Error loading file:', error)
       toast({
-        variant: "destructive",
-        title: "Error",
-        description: error instanceof Error ? error.message : 'Failed to load Figma file',
+        title: 'Error',
+        description: error instanceof Error ? error.message : 'Failed to load file',
+        variant: 'destructive',
       })
     } finally {
-      console.log('🏁 handleLoadFile completed, resetting loading state')
-      setIsLoading(false)
+      console.log('🔄 Resetting loading state')
+      setLoading(false)
     }
   }
 
   const handleReset = () => {
     console.log('🔄 Reset initiated')
-    reset()
+    setFileKey('')
+    setRootNode(null)
+    setNodeId('')
     console.log('✅ Reset completed')
   }
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    console.log('📝 Input changed:', {
-      oldValue: fileKey,
-      newValue: e.target.value
-    })
-    setFileKey(e.target.value)
+  const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    console.log('📝 Input changed:', event.target.value)
+    setFileKey(event.target.value)
   }
 
   return (
@@ -129,6 +159,7 @@ export function FigmaInput() {
                 placeholder="Enter Figma file URL"
                 value={fileKey || ''}
                 onChange={handleInputChange}
+                disabled={isLoading}
               />
             </div>
           </div>

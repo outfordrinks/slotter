@@ -1,33 +1,37 @@
 import { create } from 'zustand'
-import { immer } from 'zustand/middleware/immer'
+import { BaseNode } from '@/types/figma'
 
 interface FigmaState {
   fileKey: string | null
   nodeId: string | null
   isLoading: boolean
   error: string | null
+  // Transformed data
+  rootNode: BaseNode | null
   setFileKey: (fileKey: string) => void
   setNodeId: (nodeId: string) => void
   setLoading: (isLoading: boolean) => void
   setError: (error: string | null) => void
+  setRootNode: (node: BaseNode | null) => void
   reset: () => void
 }
 
-export const useFigmaStore = create<FigmaState>()(
-  immer((set) => ({
+export const useFigmaStore = create<FigmaState>((set) => ({
+  fileKey: null,
+  nodeId: null,
+  isLoading: false,
+  error: null,
+  rootNode: null,
+  setFileKey: (fileKey) => set({ fileKey }),
+  setNodeId: (nodeId) => set({ nodeId }),
+  setLoading: (isLoading) => set({ isLoading }),
+  setError: (error) => set({ error }),
+  setRootNode: (node) => set({ rootNode: node }),
+  reset: () => set({
     fileKey: null,
     nodeId: null,
     isLoading: false,
     error: null,
-    setFileKey: (fileKey) => set((state) => { state.fileKey = fileKey }),
-    setNodeId: (nodeId) => set((state) => { state.nodeId = nodeId }),
-    setLoading: (isLoading) => set((state) => { state.isLoading = isLoading }),
-    setError: (error) => set((state) => { state.error = error }),
-    reset: () => set((state) => {
-      state.fileKey = null
-      state.nodeId = null
-      state.isLoading = false
-      state.error = null
-    }),
-  }))
-) 
+    rootNode: null
+  }),
+})) 
