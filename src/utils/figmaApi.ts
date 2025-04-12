@@ -152,17 +152,6 @@ export async function fetchVectorUrls({ fileKey, nodeIds }: VectorParams): Promi
 }
 
 /**
- * Counts total number of nodes in the document
- */
-function countNodes(node: FigmaNode): number {
-  let count = 1; // Count current node
-  if (node.children) {
-    count += node.children.reduce((acc: number, child: FigmaNode) => acc + countNodes(child), 0);
-  }
-  return count;
-}
-
-/**
  * Finds a node by its ID in the document tree
  */
 function findNodeById(node: FigmaNode, id: string): FigmaNode | null {

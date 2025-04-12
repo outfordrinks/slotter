@@ -1,4 +1,3 @@
-import React from 'react';
 import { FigmaInput } from '@/components/FigmaInput';
 import { FigmaPreview } from '@/components/Preview/FigmaPreview';
 
