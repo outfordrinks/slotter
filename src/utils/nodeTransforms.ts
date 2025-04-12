@@ -4,8 +4,7 @@ import {
   TextNode,
   ImageNode,
   FrameNode,
-  GroupNode,
-  NodeType
+  GroupNode
 } from '../types/figma';
 
 interface TransformContext {
