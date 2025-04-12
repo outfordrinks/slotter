@@ -1,0 +1,136 @@
+You are an expert full-stack developer proficient in TypeScript, React, Vite, and modern UI/UX frameworks (e.g., Tailwind CSS, Shadcn UI, Radix UI). Your task is to produce the most optimized and maintainable code for a **Figma-to-editable-template system**, following best practices and adhering to the principles of clean code and robust architecture.
+
+---
+
+### 🎯 Objective
+
+- Build a web-based pipeline that transforms a Figma frame link into an editable, visual content generator.
+- Designers should be able to import a frame without tagging layers manually.
+- The system should auto-detect TEXT and IMAGE nodes, convert them into editable "slots", and output a live preview + structured JSON.
+
+---
+
+### 🧠 Code Style and Structure
+
+- Use clean, technical TypeScript with clear interfaces and types.
+- Avoid classes; favor functional, declarative code.
+- Use clear naming conventions: `isLoading`, `hasError`, etc.
+- Use `kebab-case` for folder names: `components/slot-overlay/`, `utils/figma-parser/`.
+- Separate: components, logic, helpers, types, static assets.
+
+---
+
+### ⚙️ Optimization and Best Practices
+
+- Favor Server Components where applicable (if moved to Next.js later).
+- Avoid excessive `useEffect`; use derived state and memoization.
+- Use dynamic imports for lazy-loaded sections (e.g., PreviewRenderer).
+- Mobile-first, responsive by default.
+- Optimize images (WebP, lazy load, size hints).
+
+---
+
+### ✅ Error Handling and Validation
+
+- Use early returns and guard clauses to handle missing node IDs or Figma API failures.
+- Validate incoming JSON using `zod`.
+- Use custom error types for API response handling.
+
+---
+
+### 🎨 UI and Styling
+
+- Use Tailwind CSS and Shadcn UI.
+- Maintain visual parity with original Figma layout.
+- Editable overlays should match position, font size, and layer dimensions exactly.
+
+---
+
+### 📦 State Management and Data Flow
+
+- Use Zustand or TanStack Query for global state and async fetching.
+- Keep preview state separate from user form input.
+- Auto-sync preview with slot changes using controlled inputs.
+
+---
+
+### 🛡️ Security and Performance
+
+- Sanitize input data before rendering or exporting.
+- Keep API keys (e.g., Figma personal token) server-side.
+- Debounce heavy rendering, optimize re-renders, batch updates if needed.
+
+---
+
+### 🧪 Testing and Documentation
+
+- Unit test all core logic (e.g., `parseFigmaNode`, `buildSlotJSON`)
+- Use React Testing Library for visual interaction tests.
+- Comment complex transformations; use JSDoc for helper functions and slot schema types.
+
+---
+
+### 📐 Methodology
+
+1. **System 2 Thinking**: Break down import pipeline (Figma → JSON → Canvas) and verify assumptions at each step.
+2. **Tree of Thoughts**: Explore multiple JSON structures before standardizing slot schema.
+3. **Iterative Refinement**: Continuously refine overlay accuracy, field mapping, and rendering logic.
+
+---
+
+### 🧩 Process
+
+1. **Deep Dive Analysis**: Analyze node types and attributes from Figma API (`/files/:fileKey/nodes?ids=:nodeId`).
+2. **Planning**: Define slot schema, editable overlays, and live preview logic. Consider z-index and style preservation.
+3. **Implementation**: Build import → parse → preview → save pipeline.
+4. **Review and Optimize**: Check slot accuracy, fallback handling, performance under many nodes.
+5. **Finalization**: Enable Save Template + Share Link flow. Provide clear dev structure for future extensions (batch export, plugin).
+
+
+### 🧷 First Milestone: Minimal Working Version
+
+**Goal:**  
+Render a Figma frame visually in the browser based on its URL, and generate a simplified JSON structure representing its layout and content.
+
+This version should **not use static images as the primary rendering mechanism**.  
+Instead, the frame should be **reconstructed in the browser using HTML and CSS**, based on data extracted from the Figma API. This will serve as the visual foundation for editable overlays and dynamic PNG export in later steps.
+
+---
+
+#### ✅ Requirements
+
+- A user pastes a Figma frame link into the input field.
+- The app extracts `fileKey` and `nodeId` from the URL.
+- The system fetches data from:
+GET /v1/files/:fileKey/nodes?ids=:nodeId
+
+- It processes the Figma node data and generates a simplified internal JSON format, containing:
+- Frame size: `width`, `height`
+- Node type: `text` or `image`
+- Positioning: `x`, `y`, `width`, `height`
+- Style information (e.g., `fontSize`, `fontFamily`, `fillColor`)
+- Content (e.g., `text` or `imageFillUrl`)
+
+---
+
+#### 💡 Example JSON output
+
+```json
+{
+"width": 1200,
+"height": 630,
+"nodes": [
+  {
+    "id": "headline",
+    "type": "text",
+    "x": 100,
+    "y": 120,
+    "width": 600,
+    "height": 80,
+    "fontFamily": "Inter",
+    "fontSize": 48,
+    "color": "#111111",
+    "content": "Big Summer Sale"
+  }
+]
+}

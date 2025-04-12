@@ -1,0 +1,478 @@
+# Overview
+The Figma-to-editable-template system is a web-based tool that transforms Figma frame designs into interactive, editable content templates. It addresses the challenge of manually converting design mockups into dynamic content by automatically detecting and converting text and image elements into editable "slots". This tool bridges the gap between designers and content creators, enabling rapid content iteration without requiring technical knowledge or manual tagging of design elements.
+
+# Core Features
+
+## 1. Figma Frame Import
+- Direct import via Figma frame URL
+- Automatic extraction of fileKey and nodeId
+- Secure handling of Figma API authentication
+- Real-time validation of frame URL format
+
+## 2. Automatic Node Detection
+- Intelligent detection of TEXT and IMAGE nodes
+- Preservation of exact positioning and styling
+- Automatic conversion into editable slots
+- Support for nested component structures
+
+## 3. Visual Preview System
+- Real-time preview of imported frame
+- HTML/CSS-based rendering (not static images)
+- Accurate representation of Figma layout
+- Responsive design support
+
+## 4. Slot Management
+- JSON-based slot definition system
+- Position-accurate overlay rendering
+- Style preservation (fonts, colors, dimensions)
+- Real-time preview updates on content changes
+
+## 5. Shareable Templates
+- Unique URL generation for each saved template
+- Template loading via `/template/:id` route
+- Public access without login requirement
+- Template data retrieved from backend storage
+- Separation between editor and public interfaces
+
+# User Experience
+
+## Target Users
+1. Content Creators
+   - Need: Easy content updating without technical skills
+   - Goal: Rapid content iteration while maintaining design fidelity
+
+2. Designers
+   - Need: Seamless handoff of editable templates
+   - Goal: No manual tagging or special preparation of designs
+
+## Key User Flows
+
+### Frame Import Flow
+1. User pastes Figma frame URL
+2. System validates URL format
+3. System fetches and processes frame data
+4. Preview renders automatically
+
+### Content Editing Flow
+1. User selects editable slot
+2. Updates content via form interface
+3. Sees real-time preview updates
+4. Exports final content
+
+### Template Sharing & Generation Flow
+1. Designer saves template and receives shareable link
+2. Team member opens public page (`/template/:id`)
+3. Enters new content into slots
+4. Real-time preview updates
+5. Downloads PNG export
+
+## UI/UX Considerations
+- Clean, minimal interface
+- Clear visual feedback for editable elements
+- Intuitive content editing controls
+- Mobile-first, responsive design
+
+## Interface Separation
+- Editor Interface (editor.slotto.io)
+  - Full template creation capabilities
+  - Figma frame import and processing
+  - Template management and sharing
+  
+- Public Generator (template.slotto.io)
+  - Simplified, focused interface
+  - Content slot editing only
+  - Real-time preview
+  - PNG export functionality
+
+# Technical Architecture
+
+## System Components
+
+### Frontend Core
+- React + TypeScript application
+- Vite for build tooling
+- Tailwind CSS + Shadcn UI for styling
+- Zustand for state management
+
+### API Layer
+- Figma API integration
+- Node processing system
+- JSON transformation logic
+
+### Data Models
+
+#### Frame Schema
+```typescript
+interface Frame {
+  width: number;
+  height: number;
+  nodes: Node[];
+}
+```
+
+#### Node Schema
+```typescript
+interface Node {
+  id: string;
+  type: 'text' | 'image';
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  style: NodeStyle;
+  content: string | ImageFill;
+}
+```
+
+## Infrastructure Requirements
+- Static hosting (Vercel/Netlify)
+- Serverless functions for API key protection
+- CDN for asset optimization
+
+# Development Roadmap
+
+## Phase 1: MVP
+1. Basic Frame Import
+   - URL input and validation
+   - Figma API connection
+   - Basic error handling
+
+2. Node Processing
+   - TEXT node detection
+   - Position extraction
+   - Style parsing
+   - JSON generation
+
+3. Visual Preview
+   - HTML/CSS rendering
+   - Position-accurate layout
+   - Basic text styling
+
+4. Content Editing
+   - Simple form interface
+   - Real-time preview updates
+   - JSON export
+
+## Phase 2: Enhanced Features
+1. Advanced Node Support
+   - IMAGE node processing
+   - Complex text styling
+   - Group handling
+
+2. UI Improvements
+   - Enhanced editing interface
+   - Visual slot indicators
+   - Responsive preview
+
+3. Export Functionality
+   - HTML-to-canvas rendering system
+   - High-quality PNG export
+   - Download final composition
+   - Optional: JSON data export for template reuse
+   - Background processing for large frames
+   - Export progress indication
+
+## Phase 3: Production Features
+1. Template Management
+   - Save/load templates
+   - Version history
+   - Share functionality
+
+2. Advanced Editing
+   - Batch content updates
+   - Style overrides
+   - Export options
+
+# Logical Dependency Chain
+
+1. Foundation (MVP Phase 1)
+   - Figma API integration ➡️ Basic node processing ➡️ JSON generation
+   - Simple preview rendering ➡️ Basic text editing ➡️ Real-time updates
+
+2. Enhanced Functionality (Phase 2)
+   - Advanced node support ➡️ Improved preview system
+   - UI enhancements ➡️ Responsive design
+
+3. Production Features (Phase 3)
+   - Template system ➡️ Sharing functionality
+   - Advanced editing ➡️ Export options
+
+# Risks and Mitigations
+
+## Technical Challenges
+1. Figma API Limitations
+   - Risk: Rate limits and data access restrictions
+   - Mitigation: Implement caching and batch processing
+
+2. Layout Accuracy
+   - Risk: Complex Figma layouts may not translate perfectly to HTML/CSS
+   - Mitigation: Implement fallback rendering strategies
+
+3. Performance
+   - Risk: Large frames with many nodes may impact performance
+   - Mitigation: Implement lazy loading and virtualization
+
+## Authentication and Security
+1. API Token Protection
+   - Risk: Exposing Figma API token in frontend
+   - Mitigation: Serverless functions to proxy all Figma API calls
+   - Mitigation: Rate limiting and request validation
+
+2. Template Access Control
+   - Risk: Unauthorized access to sensitive templates
+   - Mitigation: Access control flags for private templates
+   - Mitigation: Expiring share tokens for temporary access
+   - Mitigation: Rate limiting for public template generation
+
+3. Domain Separation
+   - Risk: Mixing editor and public interfaces
+   - Mitigation: Separate subdomains with distinct security policies
+   - Mitigation: Clear separation of editor vs public APIs
+
+## Infrastructure Security
+1. API Gateway
+   - Secure token storage in environment variables
+   - Request validation and sanitization
+   - CORS policy enforcement
+
+2. Template Storage
+   - Encrypted storage of template data
+   - Secure access patterns
+   - Regular security audits
+
+## MVP Scope
+1. Feature Creep
+   - Risk: Expanding beyond core functionality
+   - Mitigation: Strict adherence to MVP requirements
+
+2. Technical Debt
+   - Risk: Rushing implementation for quick results
+   - Mitigation: Maintain clean architecture from the start
+
+# Appendix
+
+## Technical Specifications
+
+### Supported Figma Elements
+- Text nodes (single line, paragraphs)
+- Image fills
+- Basic shapes with image fills
+- Groups and frames
+
+### Browser Support
+- Modern browsers (Chrome, Firefox, Safari, Edge)
+- Mobile browser compatibility
+
+### Performance Targets
+- Initial load: < 2s
+- Preview updates: < 100ms
+- JSON processing: < 500ms 
+
+Вот, я обновила свой PRD, а что теперь, какую команду мне нужно написать, чтобы, ну, в Таске добавить это?
+
+
+# Task Master Command Reference
+
+Here's a comprehensive reference of all available commands:
+
+## Parse PRD
+
+```bash
+# Parse a PRD file and generate tasks
+task-master parse-prd <prd-file.txt>
+
+# Limit the number of tasks generated
+task-master parse-prd <prd-file.txt> --num-tasks=10
+```
+
+## List Tasks
+
+```bash
+# List all tasks
+task-master list
+
+# List tasks with a specific status
+task-master list --status=<status>
+
+# List tasks with subtasks
+task-master list --with-subtasks
+
+# List tasks with a specific status and include subtasks
+task-master list --status=<status> --with-subtasks
+```
+
+## Show Next Task
+
+```bash
+# Show the next task to work on based on dependencies and status
+task-master next
+```
+
+## Show Specific Task
+
+```bash
+# Show details of a specific task
+task-master show <id>
+# or
+task-master show --id=<id>
+
+# View a specific subtask (e.g., subtask 2 of task 1)
+task-master show 1.2
+```
+
+## Update Tasks
+
+```bash
+# Update tasks from a specific ID and provide context
+task-master update --from=<id> --prompt="<prompt>"
+```
+
+## Update a Specific Task
+
+```bash
+# Update a single task by ID with new information
+task-master update-task --id=<id> --prompt="<prompt>"
+
+# Use research-backed updates with Perplexity AI
+task-master update-task --id=<id> --prompt="<prompt>" --research
+```
+
+## Update a Subtask
+
+```bash
+# Append additional information to a specific subtask
+task-master update-subtask --id=<parentId.subtaskId> --prompt="<prompt>"
+
+# Example: Add details about API rate limiting to subtask 2 of task 5
+task-master update-subtask --id=5.2 --prompt="Add rate limiting of 100 requests per minute"
+
+# Use research-backed updates with Perplexity AI
+task-master update-subtask --id=<parentId.subtaskId> --prompt="<prompt>" --research
+```
+
+Unlike the `update-task` command which replaces task information, the `update-subtask` command _appends_ new information to the existing subtask details, marking it with a timestamp. This is useful for iteratively enhancing subtasks while preserving the original content.
+
+## Generate Task Files
+
+```bash
+# Generate individual task files from tasks.json
+task-master generate
+```
+
+## Set Task Status
+
+```bash
+# Set status of a single task
+task-master set-status --id=<id> --status=<status>
+
+# Set status for multiple tasks
+task-master set-status --id=1,2,3 --status=<status>
+
+# Set status for subtasks
+task-master set-status --id=1.1,1.2 --status=<status>
+```
+
+When marking a task as "done", all of its subtasks will automatically be marked as "done" as well.
+
+## Expand Tasks
+
+```bash
+# Expand a specific task with subtasks
+task-master expand --id=<id> --num=<number>
+
+# Expand with additional context
+task-master expand --id=<id> --prompt="<context>"
+
+# Expand all pending tasks
+task-master expand --all
+
+# Force regeneration of subtasks for tasks that already have them
+task-master expand --all --force
+
+# Research-backed subtask generation for a specific task
+task-master expand --id=<id> --research
+
+# Research-backed generation for all tasks
+task-master expand --all --research
+```
+
+## Clear Subtasks
+
+```bash
+# Clear subtasks from a specific task
+task-master clear-subtasks --id=<id>
+
+# Clear subtasks from multiple tasks
+task-master clear-subtasks --id=1,2,3
+
+# Clear subtasks from all tasks
+task-master clear-subtasks --all
+```
+
+## Analyze Task Complexity
+
+```bash
+# Analyze complexity of all tasks
+task-master analyze-complexity
+
+# Save report to a custom location
+task-master analyze-complexity --output=my-report.json
+
+# Use a specific LLM model
+task-master analyze-complexity --model=claude-3-opus-20240229
+
+# Set a custom complexity threshold (1-10)
+task-master analyze-complexity --threshold=6
+
+# Use an alternative tasks file
+task-master analyze-complexity --file=custom-tasks.json
+
+# Use Perplexity AI for research-backed complexity analysis
+task-master analyze-complexity --research
+```
+
+## View Complexity Report
+
+```bash
+# Display the task complexity analysis report
+task-master complexity-report
+
+# View a report at a custom location
+task-master complexity-report --file=my-report.json
+```
+
+## Managing Task Dependencies
+
+```bash
+# Add a dependency to a task
+task-master add-dependency --id=<id> --depends-on=<id>
+
+# Remove a dependency from a task
+task-master remove-dependency --id=<id> --depends-on=<id>
+
+# Validate dependencies without fixing them
+task-master validate-dependencies
+
+# Find and fix invalid dependencies automatically
+task-master fix-dependencies
+```
+
+## Add a New Task
+
+```bash
+# Add a new task using AI
+task-master add-task --prompt="Description of the new task"
+
+# Add a task with dependencies
+task-master add-task --prompt="Description" --dependencies=1,2,3
+
+# Add a task with priority
+task-master add-task --prompt="Description" --priority=high
+```
+
+## Initialize a Project
+
+```bash
+# Initialize a new project with Task Master structure
+task-master init
+```
