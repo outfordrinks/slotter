@@ -1,13 +1,14 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { RootLayout } from './layouts/RootLayout'
-import { EditorPage } from './pages/EditorPage'
-import { TemplatePage } from './pages/TemplatePage'
-import { NotFoundPage } from './pages/NotFoundPage'
+import { EditorPage } from './pages/EditorPage.tsx'
+import { TemplatePage } from './pages/TemplatePage.tsx'
+import { NotFoundPage } from './pages/NotFoundPage.tsx'
 import { ThemeProvider } from "@/components/theme-provider"
+import { Toaster } from "@/components/ui/toaster"
 
 function App() {
   return (
-    <ThemeProvider defaultTheme="dark" attribute="class">
+    <ThemeProvider defaultTheme="dark" attribute="class" storageKey="vite-ui-theme">
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<RootLayout />}>
@@ -18,6 +19,7 @@ function App() {
           </Route>
         </Routes>
       </BrowserRouter>
+      <Toaster />
     </ThemeProvider>
   )
 }
