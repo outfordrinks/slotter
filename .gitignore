@@ -32,6 +32,10 @@ dist-ssr
 build/
 .vercel
 
+# TypeScript build info
+*.tsbuildinfo
+vite.config.d.ts
+
 # Added by Claude Task Master
 dev-debug.log
 # Dependency directories

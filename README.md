@@ -48,15 +48,30 @@ A powerful template editor that helps you create and manage content with ease, u
 - `npm run preview` - Preview production build
 - `npm run lint` - Run ESLint
 - `npm run format` - Format code with Prettier
+- `npm run test` - Run tests
+- `npm run coverage` - Run tests with coverage
 
 ## Deployment
 
-The project is configured for deployment on Vercel. Simply:
+The project can be deployed to either Netlify or Vercel:
 
+### Netlify Deployment
+1. Push your code to GitHub
+2. Import the repository in Netlify
+3. Configure environment variables
+4. Netlify will automatically detect the build settings from `netlify.toml`
+
+### Vercel Deployment
 1. Push your code to GitHub
 2. Import the repository in Vercel
 3. Configure environment variables
-4. Deploy!
+4. Vercel will automatically detect the build settings from `vercel.json`
+
+Choose the platform that best suits your needs. Both provide:
+- Automatic HTTPS
+- Continuous deployment
+- Preview deployments
+- Custom domains
 
 ## Tech Stack
 
